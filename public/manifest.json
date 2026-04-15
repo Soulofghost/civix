@@ -1,0 +1,15 @@
+{
+  "short_name": "Civix",
+  "name": "Smart Civic Issue Reporting System",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0B0B0F",
+  "background_color": "#0B0B0F"
+}
