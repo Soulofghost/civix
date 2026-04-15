@@ -12,18 +12,25 @@ export default defineConfig({
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor': [
-            'react', 
-            'react-dom', 
-            'react-router-dom', 
-            'framer-motion', 
-            'zustand'
-          ],
-          'ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge'],
-          'charts': ['recharts'],
-          'maps': ['leaflet', 'react-leaflet'],
-          'pdf': ['jspdf']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-router-dom') || id.includes('framer-motion') || id.includes('zustand')) {
+              return 'vendor';
+            }
+            if (id.includes('lucide-react') || id.includes('sonner') || id.includes('clsx') || id.includes('tailwind-merge')) {
+              return 'ui-core';
+            }
+            if (id.includes('recharts')) {
+              return 'analytics';
+            }
+            if (id.includes('leaflet')) {
+              return 'geo';
+            }
+            if (id.includes('jspdf')) {
+              return 'pdf-engine';
+            }
+            return 'common-libs';
+          }
         }
       }
     }
