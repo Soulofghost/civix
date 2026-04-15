@@ -21,6 +21,18 @@ const ProtectedRoute = ({ children, roles }) => {
 };
 
 
+function Home() {
+  const { user, isAuthenticated } = useAuthStore();
+  
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  
+  if (['Admin', 'Super Admin', 'Authority', 'Field Worker'].includes(user?.role)) {
+    return <Navigate to="/admin" />;
+  }
+  
+  return <Navigate to="/dashboard" />;
+}
+
 function App() {
   const { isAuthenticated, initialize, loading } = useAuthStore();
 
@@ -42,10 +54,10 @@ function App() {
 
     <>
       <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Home />} />
         
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<Home />} />
           <Route 
             path="/dashboard" 
             element={
