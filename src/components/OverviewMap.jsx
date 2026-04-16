@@ -25,9 +25,10 @@ export default function OverviewMap() {
   
   // Default coordinates for Kochi
   const defaultCoords = [9.9816, 76.2999];
-  const activeCoords = (complaints.length > 0 && complaints[0].location.lat) 
+  const activeCoords = (complaints.length > 0 && complaints[0].location?.lat) 
     ? [complaints[0].location.lat, complaints[0].location.lng] 
     : defaultCoords;
+
 
   return (
     <div className="h-[400px] w-full rounded-2xl overflow-hidden glass-panel border border-white/10 shadow-glass">

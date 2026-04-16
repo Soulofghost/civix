@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Leaderboard from './pages/Leaderboard';
 import Profile from './pages/Profile';
 import BotWidget from './components/BotWidget';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const ProtectedRoute = ({ children, roles }) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -34,83 +35,55 @@ function Home() {
 }
 
 function App() {
-  const { isAuthenticated, initialize, loading } = useAuthStore();
+  const { isAuthenticated, initialize, loading, error: authError } = useAuthStore();
 
   useEffect(() => {
-    initialize();
+    console.log("APP: Initializing main application logic...");
+    initialize().catch(err => {
+      console.error("APP_INIT_ERROR:", err);
+    });
   }, [initialize]);
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#0A0B10]">
-        <div className="relative">
-          <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin"></div>
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0A0B10]">
+        <div className="relative mb-6">
+          <div className="absolute -inset-4 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="w-16 h-16 border-4 border-purple-500/10 border-t-purple-500 rounded-full animate-spin relative z-10"></div>
+        </div>
+        <p className="text-white/40 font-black italic tracking-widest uppercase text-[10px] animate-pulse">
+          Synchronizing Neural Interface...
+        </p>
+        <div className="mt-8 flex gap-2">
+           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0s' }}></span>
+           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0.4s' }}></span>
         </div>
       </div>
     );
   }
 
   return (
-
-    <>
+    <ErrorBoundary>
+      {isAuthenticated && <p className="fixed top-2 left-1/2 -translate-x-1/2 z-[9999] text-[8px] font-black text-emerald-500/40 uppercase tracking-[0.5em] pointer-events-none">Dashboard Ready ✅</p>}
       <Routes>
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Home />} />
         
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute roles={['Admin', 'Super Admin', 'Authority', 'Field Worker']}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/submit" 
-            element={
-              <ProtectedRoute>
-                <SubmitComplaint />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/communication" 
-            element={
-              <ProtectedRoute>
-                <Communication />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/leaderboard" 
-            element={
-              <ProtectedRoute>
-                <Leaderboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/profile" 
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute roles={['Admin', 'Super Admin', 'Authority', 'Field Worker']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/submit" element={<ProtectedRoute><SubmitComplaint /></ProtectedRoute>} />
+          <Route path="/communication" element={<ProtectedRoute><Communication /></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       
       {isAuthenticated && <BotWidget />}
-    </>
+    </ErrorBoundary>
   );
 }
 
