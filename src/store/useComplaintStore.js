@@ -50,7 +50,7 @@ const MOCK_COMPLAINTS = [
 export const useComplaintStore = create((set, get) => ({
   complaints: [],
   activities: [
-    { id: 1, user: 'Arun K.', action: 'upvoted report CIVIX-1024-A', time: '2 mins ago' },
+    { id: 1, user: 'Anil CC', action: 'upvoted report CIVIX-1024-A', time: '2 mins ago' },
     { id: 2, user: 'System Control', action: 'resolved ticket CIVIX-1026-C', time: '1 hr ago' },
   ],
   notifications: [

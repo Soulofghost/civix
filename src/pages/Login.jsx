@@ -27,15 +27,24 @@ export default function Login() {
     try {
       if (isLogin) {
         const result = await login(email, password);
-        if (!result?.error) {
+        if (result?.error) {
+          toast.error(result.error);
+        } else {
           toast.success("Identity verified. Accessing Civix.");
+          // Force redirect — don't wait for auth state change
+          setTimeout(() => { window.location.href = '/dashboard'; }, 500);
         }
       } else {
         if (!displayName) return toast.error("Full name required for registration.");
         const result = await signUp(email, password, displayName);
-        if (!result?.error) {
-          toast.success("Profile initialized. Check your dashboard.");
+        if (result?.error) {
+          toast.error(result.error);
+        } else if (result?.needsConfirmation) {
+          toast.info("Check your email to confirm your account, then log in.");
           setIsLogin(true);
+        } else {
+          toast.success("Account created! Welcome to Civix.");
+          setTimeout(() => { window.location.href = '/dashboard'; }, 500);
         }
       }
     } catch (err) {
