@@ -13,8 +13,9 @@ const MOCK_COMPLAINTS = [
     region: { city: 'Kochi' }, 
     location: { lat: 9.9816, lng: 76.2999, address: 'Civil Line Rd, Kochi' }, 
     priority: 'Critical',
+    attachments: ['/water_leak.png'],
     created_at: new Date(Date.now() - 86400000).toISOString(),
-    timeline: [{ status: 'Submitted', timestamp: new Date(Date.now() - 86400000).toISOString(), note: 'Verified by Regional Node' }]
+    timeline: [{ status: 'Submitted', timestamp: new Date(Date.now() - 86400000).toISOString(), note: 'Verified by Regional Authority' }]
   },
   { 
     id: 'CIVIX-1025-B', 
@@ -26,6 +27,7 @@ const MOCK_COMPLAINTS = [
     region: { city: 'Kochi' }, 
     location: { lat: 9.9700, lng: 76.3100, address: 'MG Road, Kochi' }, 
     priority: 'High',
+    attachments: ['/road_pothole.png'],
     created_at: new Date(Date.now() - 172800000).toISOString(),
     timeline: [{ status: 'Submitted', timestamp: new Date(Date.now() - 172800000).toISOString(), note: 'Awaiting Department Assignment' }]
   },
@@ -39,6 +41,7 @@ const MOCK_COMPLAINTS = [
     region: { city: 'Kochi' }, 
     location: { lat: 9.9900, lng: 76.2900, address: 'Marine Drive, Kochi' }, 
     priority: 'Medium',
+    attachments: ['/garbage_leak.png'],
     created_at: new Date(Date.now() - 432000000).toISOString(),
     timeline: [{ status: 'Resolved', timestamp: new Date().toISOString(), note: 'Sanitation team deployed and verified.' }]
   }
@@ -47,11 +50,11 @@ const MOCK_COMPLAINTS = [
 export const useComplaintStore = create((set, get) => ({
   complaints: [],
   activities: [
-    { id: 1, user: 'Arun K.', action: 'upvoted protocol CIVIX-1024-A', time: '2 mins ago' },
+    { id: 1, user: 'Arun K.', action: 'upvoted report CIVIX-1024-A', time: '2 mins ago' },
     { id: 2, user: 'System Control', action: 'resolved ticket CIVIX-1026-C', time: '1 hr ago' },
   ],
   notifications: [
-    { id: 1, title: 'Network Synchronization', message: 'Regional fail-safe active. All data is locally verified.', read: false, time: 'Now' },
+    { id: 1, title: 'Network Status', message: 'All regional nodes are currently active.', read: false, time: 'Now' },
   ],
   news: [
     { id: 1, title: 'Smart Grid Expansion: Kochi West', date: '2026-04-18', category: 'Project' },
@@ -70,7 +73,6 @@ export const useComplaintStore = create((set, get) => ({
     set({ loading: true });
     
     if (IS_DEMO_MODE) {
-      console.log("STORE: Invoking regional data simulation...");
       await new Promise(res => setTimeout(res, 500));
       set({ complaints: MOCK_COMPLAINTS, loading: false });
       return;
@@ -128,6 +130,6 @@ export const useComplaintStore = create((set, get) => ({
   },
 
   uploadFile: async () => {
-     return 'https://images.unsplash.com/photo-1518135839073-427c945a6c66?q=80&w=800';
+     return '/water_leak.png'; 
   }
 }));

@@ -1,27 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* tailwind-ignore-rule */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @layer base {
   body {
-    @apply bg-[#0A0B10] text-[#E1E1E1] font-outfit antialiased selection:bg-purple-500/30 selection:text-white;
+    /* @apply bg-[#0A0B10] text-[#E1E1E1] font-outfit antialiased selection:bg-purple-500/30 selection:text-white; */
+    background-color: #0A0B10;
+    color: #E1E1E1;
+    font-family: 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 }
 
 @layer utilities {
   .glass-panel {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
   }
   
   .glass-card {
-    @apply bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-lg border border-white/10 rounded-[2rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)];
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   }
 
   .glass-input {
-    @apply bg-white/5 border border-white/10 focus:border-purple-500/50 focus:ring-4 focus:ring-purple-500/10 transition-all duration-300 rounded-xl px-4 py-3 outline-none;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .glass-input:focus {
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
   }
   
   .text-glow {
@@ -94,13 +116,18 @@
 }
 
 .custom-popup .leaflet-popup-content-wrapper {
-  @apply bg-[#15171F] text-white border border-white/10 rounded-2xl shadow-2xl backdrop-blur-md;
+  background-color: #15171F;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
 }
 .custom-popup .leaflet-popup-tip {
-  @apply bg-[#15171F];
+  background-color: #15171F;
 }
 
-/* Fix for select/option accessibility in custom themes */
+/* Fix for select/option accessibility */
 select {
   color-scheme: dark;
 }

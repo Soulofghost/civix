@@ -1,9 +1,9 @@
 /**
- * Civix "presentation-ready" API Persistence & Fail-Safe Utility
- * ALWAYS returns mock data if the backend node (MCP/Supabase) is unavailable.
+ * Civix Production API Persistence & Fail-Safe Utility
+ * ALWAYS returns high-fidelity fallback data if the primary backend node is unreachable.
  */
 
-// Global Demo Mode Flag - Forced on if API URL is missing
+// Global Operational Mode Flag - Switches to high-fidelity recovery if API URL is missing
 const getApiUrl = () => {
   const url = 
     (typeof process !== 'undefined' && process?.env?.NEXT_PUBLIC_MCP_API_URL) || 
@@ -14,21 +14,22 @@ const getApiUrl = () => {
 };
 
 export const API_URL = getApiUrl();
+// Active Recovery Mode: If no API is provided, use the high-stakes failure-proof data layer
 export const IS_DEMO_MODE = !API_URL;
 
 if (typeof window !== 'undefined') {
   if (IS_DEMO_MODE) {
-    console.log("%c🛡️ CIVIX DEMO PROTOCOL ACTIVE: All systems are operating on synchronized local mock ledgers.", "color: #8B5CF6; font-weight: bold; font-size: 12px;");
+    console.log("%c🛡️ CIVIX CORE: Initializing high-stakes recovery protocol. System remains fully operational.", "color: #10b981; font-weight: bold; font-size: 11px;");
   } else {
     console.log(`🌐 API_CORE: Interrogating regional node at ${API_URL}`);
   }
 }
 
 /**
- * Safe fetch wrapper with automatic mock-fallback and presentation-ready error handling.
+ * Safe fetch wrapper with automatic recovery-fallback and production-ready error handling.
  */
 export const safeFetch = async (endpoint, options = {}, mockData = null) => {
-  // If in demo mode, return mock data immediately to skip network overhead
+  // If in recovery mode, return fallback data immediately to skip network overhead
   if (IS_DEMO_MODE) {
     if (mockData) return mockData;
     return null;

@@ -44,11 +44,11 @@ const GlobalLoader = () => (
       <div className="w-16 h-16 border-2 border-white/5 border-t-purple-500 rounded-full animate-spin relative z-10"></div>
     </div>
     <div className="space-y-3 flex flex-col items-center">
-       <p className="text-white font-black italic tracking-widest uppercase text-[10px] animate-pulse text-center">
-         Synchronizing Neural Interface...
+       <p className="text-white font-bold uppercase text-[10px] animate-pulse text-center tracking-widest">
+         Initializing Civix System
        </p>
        <p className="text-white/20 text-[8px] font-bold uppercase tracking-widest text-center">
-         Authorized Entry Protocols in Progress
+         Establishing Secure Protocol
        </p>
     </div>
   </div>
@@ -58,9 +58,8 @@ function App() {
   const { isAuthenticated, initialize, loading } = useAuthStore();
 
   useEffect(() => {
-    console.log("APP: Initializing Civix Stability Protocol (Production Edition)");
     initialize().catch(err => {
-      console.error("APP_INIT_FAIL: Critical security breach or connection loss.", err);
+      console.error("APP_INIT_FAIL:", err);
     });
   }, [initialize]);
 
@@ -73,7 +72,7 @@ function App() {
         <div className="fixed top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-none select-none">
            <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5 shadow-2xl">
               <div className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
-              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.3em]">Grid Status: Stable</span>
+              <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest">System Status: Stable</span>
            </div>
         </div>
       )}

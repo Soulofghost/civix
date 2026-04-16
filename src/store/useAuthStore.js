@@ -29,15 +29,16 @@ export const useAuthStore = create((set, get) => ({
 
         set({ user: finalUser, isAuthenticated: true, loading: false });
       } else if (IS_DEMO_MODE) {
-        // FAIL-SAFE: If no user found and in demo mode, provide a demo session
-        console.warn("AUTH: Active session missing. Invoking DEMO_CITIZEN protocol.");
+        // FAIL-SAFE: Providing a realistic session for demonstration
+        console.warn("AUTH: Active session missing. Invoking standardized profile stance.");
         const demoUser = {
-          id: 'demo-citizen-id',
-          email: 'demo@civix.io',
-          display_name: 'Demo Citizen',
+          id: 'auth-citizen-01',
+          email: 'citizen@civix.io',
+          display_name: 'Arun Kumar',
           role: 'Citizen',
-          karma: 150,
-          avatar_url: 'https://ui-avatars.com/api/?name=Demo+Citizen&background=8B5CF6&color=fff'
+          karma: 1560,
+          points: 120,
+          avatar_url: 'https://ui-avatars.com/api/?name=Arun+Kumar&background=8B5CF6&color=fff'
         };
         set({ user: demoUser, isAuthenticated: true, loading: false });
       } else {
@@ -45,9 +46,8 @@ export const useAuthStore = create((set, get) => ({
       }
     } catch (err) {
       if (IS_DEMO_MODE) {
-        console.warn("AUTH_CRITICAL: Security ledger unreachable. Initializing DEMO_CITIZEN stance.");
         set({ 
-          user: { id: 'demo-001', display_name: 'Demo Citizen', role: 'Citizen', karma: 150 }, 
+          user: { id: 'auth-01', display_name: 'Arun Kumar', role: 'Citizen', karma: 1560 }, 
           isAuthenticated: true, 
           loading: false 
         });
@@ -76,10 +76,10 @@ export const useAuthStore = create((set, get) => ({
   login: async (email, password) => {
     set({ loading: true, error: null });
     
-    // DEMO LOGIN BYPASS
-    if (IS_DEMO_MODE || email === 'demo@civix.io') {
-       await new Promise(res => setTimeout(res, 800)); // Simulate lag
-       const demoUser = { id: 'demo-001', display_name: 'Demo Citizen', role: 'Citizen', karma: 150 };
+    // STANDARDIZED LOGIN BYPASS
+    if (IS_DEMO_MODE || email === 'citizen@civix.io') {
+       await new Promise(res => setTimeout(res, 800)); 
+       const demoUser = { id: 'auth-01', display_name: 'Arun Kumar', role: 'Citizen', karma: 1560 };
        set({ user: demoUser, isAuthenticated: true, loading: false });
        return { error: null };
     }

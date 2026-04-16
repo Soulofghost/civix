@@ -33,7 +33,6 @@ export default function MainLayout() {
     navItems.push({ name: t('control_center'), path: '/admin', icon: <ShieldAlert size={20} /> });
   }
 
-
   const notifications = [
     { id: 1, type: 'spike', text: 'Regional Alert: 12 new water issues in Kochi today.', icon: <ShieldCheck className="text-secondary" /> },
     { id: 2, type: 'escalation', text: 'Grievance CIVIX-1001-92 has breached 30-day SLA.', icon: <AlertTriangle className="text-danger" /> },
@@ -44,8 +43,8 @@ export default function MainLayout() {
     <div className="flex flex-col h-full bg-surfaceHighlight border-r border-white/5">
       <div className="flex items-center justify-between p-6">
         <div className="flex items-center gap-3">
-          <img src="/logo.jpeg" alt="Logo" className="w-8 h-8 rounded-lg object-cover shadow-glow" />
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent italic">
+          <img src="/logo.jpeg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Civix
           </h1>
         </div>
@@ -63,27 +62,27 @@ export default function MainLayout() {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
                 isActive 
-                ? 'bg-primary text-white shadow-glow translate-x-1' 
+                ? 'bg-primary text-white shadow-md' 
                 : 'text-textSecondary hover:bg-white/5 hover:text-white'
               }`
             }
           >
             <span className="shrink-0">{item.icon}</span>
-            <span className="font-medium">{item.name}</span>
+            <span className="font-semibold">{item.name}</span>
           </NavLink>
         ))}
       </nav>
 
       <div className="p-4 border-t border-white/10">
-        <Link to="/profile" className="glass-panel p-4 flex items-center justify-between mb-4 bg-white/5 hover:bg-white/10 transition-colors">
+        <Link to="/profile" className="p-4 flex items-center justify-between mb-4 bg-white/5 hover:bg-white/10 transition-colors rounded-xl overflow-hidden">
           <div className="flex items-center gap-3 overflow-hidden">
              <img src={`https://ui-avatars.com/api/?name=${user?.display_name}&background=8A2BE2&color=fff`} className="w-8 h-8 rounded-lg" />
-             <div className="flex flex-col overflow-hidden">
+             <div className="flex flex-col overflow-hidden text-left">
                <span className="text-xs font-bold text-white truncate">{user?.display_name}</span>
-               <span className="text-[10px] text-textSecondary uppercase font-black truncate">{user?.role}</span>
+               <span className="text-[10px] text-textSecondary uppercase font-bold truncate">{user?.role}</span>
              </div>
           </div>
-          <div className="bg-surface px-2 py-1 rounded text-[10px] font-bold text-accent">
+          <div className="bg-surface px-2 py-1 rounded text-[10px] font-bold text-accent shrink-0">
             {user?.points}
           </div>
         </Link>
@@ -129,7 +128,6 @@ export default function MainLayout() {
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
         <header className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-white/5 bg-surface/30 backdrop-blur-xl z-20">
@@ -141,17 +139,16 @@ export default function MainLayout() {
               <Menu size={24} />
             </button>
             <div className="flex items-center gap-3">
-              <img src="/logo.jpeg" alt="Logo" className="w-8 h-8 rounded-lg object-cover shadow-glow" />
-              <div className="hidden sm:block">
-                  <h2 className="text-xl font-black tracking-tight uppercase flex items-center gap-2">
+              <img src="/logo.jpeg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
+              <div className="hidden sm:block text-left">
+                  <h2 className="text-xl font-bold tracking-tight uppercase flex items-center gap-2">
                     <span className="text-white">Civix</span> 
-                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent pr-1">
+                    <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                       {t('dashboard')}
                     </span>
                   </h2>
-                  <p className="text-[10px] text-textSecondary uppercase font-black">{userRegion.city} | {userRegion.state}</p>
+                  <p className="text-[10px] text-textSecondary uppercase font-bold">{userRegion.city} | {userRegion.state}</p>
                 </div>
-
             </div>
           </div>
 
@@ -159,7 +156,7 @@ export default function MainLayout() {
              <div className="hidden lg:flex items-center gap-2 glass-panel px-3 py-1.5 border-white/5 bg-surfaceHighlight/50">
                <Globe size={14} className="text-primary" />
                <select 
-                 className="bg-transparent border-none focus:outline-none text-[10px] font-black text-textSecondary cursor-pointer hover:text-white transition-colors uppercase"
+                 className="bg-transparent border-none focus:outline-none text-[10px] font-bold text-textSecondary cursor-pointer hover:text-white transition-colors uppercase"
                  value={userRegion.city}
                  onChange={(e) => {
                    const r = availableRegions[0].states[0].districts[0].cities.find(x => x.name === e.target.value);
@@ -173,7 +170,7 @@ export default function MainLayout() {
             <div className="hidden lg:flex items-center gap-2 glass-panel px-3 py-1.5 border-white/5 bg-surfaceHighlight/50">
                <Languages size={14} className="text-accent" />
                <select 
-                 className="bg-transparent border-none focus:outline-none text-[10px] font-black text-textSecondary cursor-pointer hover:text-white transition-colors uppercase"
+                 className="bg-transparent border-none focus:outline-none text-[10px] font-bold text-textSecondary cursor-pointer hover:text-white transition-colors uppercase"
                  value={currentLanguage}
                  onChange={(e) => setLanguage(e.target.value)}
                >
@@ -185,14 +182,13 @@ export default function MainLayout() {
                </select>
             </div>
 
-
              <div className="relative">
                 <button 
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative text-textSecondary hover:text-white transition-colors p-2 hover:bg-white/5 rounded-xl group"
+                  className="relative text-textSecondary hover:text-white transition-colors p-2 hover:bg-white/5 rounded-xl"
                 >
                   <Bell size={20} />
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full shadow-glow"></span>
+                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-primary rounded-full"></span>
                 </button>
                 
                 <AnimatePresence>
@@ -201,33 +197,30 @@ export default function MainLayout() {
                       initial={{ opacity: 0, scale: 0.95, y: 10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                      className="absolute right-0 mt-3 w-80 bg-[#1A1C26] border border-white/20 shadow-[0_20px_80px_rgba(0,0,0,0.8)] z-[10000] rounded-2xl overflow-hidden backdrop-blur-3xl"
+                      className="absolute right-0 mt-3 w-80 bg-[#1A1C26] border border-white/10 shadow-2xl z-[10000] rounded-2xl overflow-hidden backdrop-blur-3xl"
                     >
                       <div className="p-4 bg-white/5 border-b border-white/10 flex justify-between items-center">
-                         <h3 className="font-bold text-sm text-white">Grievance Alerts</h3>
-                         <button className="text-[10px] text-primary uppercase font-black hover:text-white transition-colors" onClick={() => setShowNotifications(false)}>Clear</button>
+                         <h3 className="font-bold text-sm text-white text-left">Alerts</h3>
+                         <button className="text-[10px] text-primary uppercase font-bold hover:text-white transition-colors" onClick={() => setShowNotifications(false)}>Clear</button>
                       </div>
-                      <div className="max-h-96 overflow-y-auto custom-scrollbar">
+                      <div className="max-h-80 overflow-y-auto custom-scrollbar">
                          {notifications.map(n => (
-                           <div key={n.id} className="p-4 border-b border-white/5 hover:bg-white/10 transition-all flex gap-3 cursor-pointer group">
-                              <div className="shrink-0 mt-0.5 group-hover:scale-110 transition-transform">{n.icon}</div>
-                              <p className="text-[11px] text-white/60 leading-relaxed group-hover:text-white transition-colors">{n.text}</p>
+                           <div key={n.id} className="p-4 border-b border-white/5 hover:bg-white/10 transition-all flex gap-3 cursor-pointer group text-left">
+                               <div className="shrink-0 mt-0.5">{n.icon}</div>
+                               <p className="text-[11px] text-white/50 leading-relaxed font-medium group-hover:text-white transition-colors">{n.text}</p>
                            </div>
                          ))}
-                      </div>
-                      <div className="p-3 text-center bg-black/20">
-                         <button className="text-[10px] font-black uppercase text-white/30 hover:text-white transition-colors" onClick={() => setShowNotifications(false)}>View Unified History</button>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
              </div>
             
-            <Link to="/profile" className="hover:scale-110 transition-transform">
+            <Link to="/profile">
               <img 
                 src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.display_name}&background=8A2BE2&color=fff`} 
                 alt="Avatar" 
-                className="w-8 h-8 rounded-lg border border-white/10 ml-2 shadow-sm"
+                className="w-8 h-8 rounded-lg border border-white/10 ml-2"
               />
             </Link>
 
@@ -235,9 +228,6 @@ export default function MainLayout() {
         </header>
 
         <main className="flex-1 overflow-auto p-4 md:p-8 relative custom-scrollbar">
-          <div className="absolute top-[-10%] left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" />
-          <div className="absolute bottom-[-10%] right-1/4 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" />
-          
           <div className="relative z-10 max-w-7xl mx-auto min-h-full">
             <Outlet />
           </div>
