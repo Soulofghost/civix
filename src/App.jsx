@@ -12,6 +12,7 @@ const Communication = lazy(() => import('./pages/Communication'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Leaderboard = lazy(() => import('./pages/Leaderboard'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Advocate = lazy(() => import('./pages/Advocate'));
 const BotWidget = lazy(() => import('./components/BotWidget'));
 
 /**
@@ -90,6 +91,7 @@ function App() {
             <Route path="/submit" element={<ProtectedRoute><SubmitComplaint /></ProtectedRoute>} />
             <Route path="/communication" element={<ProtectedRoute><Communication /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/advocate" element={<ProtectedRoute><Advocate /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Route>
 

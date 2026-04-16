@@ -126,7 +126,7 @@ export const useAuthStore = create((set, get) => ({
       if (error) throw error;
     } catch (err) {
       console.error("Google Auth Error:", err.message);
-      toast.error("Google protocol activation failed.");
+      toast.error("Google sign-in failed: " + err.message);
     }
   },
 

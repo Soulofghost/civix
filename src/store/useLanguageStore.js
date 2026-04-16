@@ -5,6 +5,7 @@ const translations = {
   en: {
     dashboard: "Overview",
     register_issue: "Report an Issue",
+    free_advocate: "Free Advocate Support",
     regional_network: "Community Chat",
     control_center: "Admin Panel",
     logout: "Logout",
@@ -34,6 +35,7 @@ const translations = {
   ml: {
     dashboard: "ഡാഷ്‌ബോർഡ്",
     register_issue: "പരാതി രജിസ്റ്റർ ചെയ്യുക",
+    free_advocate: "സൗജന്യ നിയമ സഹായം",
     regional_network: "പ്രാദേശിക ശൃംഖല",
     control_center: "നിയന്ത്രണ കേന്ദ്രം",
     logout: "ലോഗൗട്ട്",
@@ -63,6 +65,7 @@ const translations = {
   hi: {
     dashboard: "डैशबोर्ड",
     register_issue: "मुद्दा दर्ज करें",
+    free_advocate: "मुफ्त वकील सहायता",
     regional_network: "क्षेत्रीय नेटवर्क",
     control_center: "नियंत्रण केंद्र",
     logout: "लोग आउट",

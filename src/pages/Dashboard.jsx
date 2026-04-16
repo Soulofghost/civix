@@ -233,13 +233,13 @@ export default function Dashboard() {
                 >
                   <div className="relative h-48 rounded-[1.5rem] overflow-hidden m-1 bg-black/40">
                     <img 
-                      src={complaint.attachments?.[0] || 'https://images.unsplash.com/photo-1518135839073-427c945a6c66?q=80&w=800&auto=format&fit=crop'} 
+                      src={complaint.attachments?.[0] || '/water_leak_v2.png'} 
                       alt={complaint.title} 
                       onError={(e) => {
                         e.target.onerror = null; 
-                        e.target.src = '/water_leak.png';
+                        e.target.src = '/water_leak_v2.png';
                       }}
-                      className="w-full h-full object-cover grayscale-[0.2] transition-all duration-500"
+                      className="w-full h-full object-cover transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-60" />
                     <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-[9px] font-bold uppercase">

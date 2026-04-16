@@ -5,7 +5,7 @@ import { useRegionStore } from '../store/useRegionStore';
 import { useLanguageStore } from '../store/useLanguageStore';
 import { 
   Home, PlusCircle, MessageSquare, ShieldAlert, 
-  LogOut, Menu, X, Bell, Globe, AlertTriangle, ShieldCheck, Languages, Trophy
+  LogOut, Menu, X, Bell, Globe, AlertTriangle, ShieldCheck, Languages, Trophy, Scale
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,8 +25,9 @@ export default function MainLayout() {
   const navItems = [
     { name: t('dashboard'), path: '/dashboard', icon: <Home size={20} /> },
     { name: t('register_issue'), path: '/submit', icon: <PlusCircle size={20} /> },
-    { name: t('leaderboard'), path: '/leaderboard', icon: <Trophy size={20} /> },
+    { name: t('free_advocate'), path: '/advocate', icon: <Scale size={20} /> },
     { name: t('regional_network'), path: '/communication', icon: <MessageSquare size={20} /> },
+    { name: t('leaderboard'), path: '/leaderboard', icon: <Trophy size={20} /> },
   ];
 
   if (['Admin', 'Super Admin', 'Authority', 'Field Worker'].includes(user?.role)) {

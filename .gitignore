@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables - NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# MCP config (contains project refs)
+.mcp.json
+
+# Temp/legacy directories
+cv4/

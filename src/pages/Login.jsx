@@ -26,13 +26,17 @@ export default function Login() {
     
     try {
       if (isLogin) {
-        await login(email, password);
-        toast.success("Identity verified. Accessing Civix.");
+        const result = await login(email, password);
+        if (!result?.error) {
+          toast.success("Identity verified. Accessing Civix.");
+        }
       } else {
         if (!displayName) return toast.error("Full name required for registration.");
-        await signUp(email, password, displayName);
-        toast.success("Profile initialized. Check your dashboard.");
-        setIsLogin(true);
+        const result = await signUp(email, password, displayName);
+        if (!result?.error) {
+          toast.success("Profile initialized. Check your dashboard.");
+          setIsLogin(true);
+        }
       }
     } catch (err) {
       toast.error(err.message || 'Authentication failure.');
