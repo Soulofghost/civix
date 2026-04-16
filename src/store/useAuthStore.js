@@ -94,6 +94,42 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  signUp: async (email, password, displayName) => {
+    set({ loading: true, error: null });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: displayName,
+          }
+        }
+      });
+      if (error) throw error;
+      set({ loading: false });
+      return { error: null };
+    } catch (err) {
+      set({ error: err.message, loading: false });
+      return { error: err.message };
+    }
+  },
+
+  loginWithGoogle: async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error("Google Auth Error:", err.message);
+      toast.error("Google protocol activation failed.");
+    }
+  },
+
   logout: async () => {
     if (!IS_DEMO_MODE) await supabase.auth.signOut();
     set({ user: null, isAuthenticated: false });

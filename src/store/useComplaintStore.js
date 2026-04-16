@@ -129,7 +129,30 @@ export const useComplaintStore = create((set, get) => ({
     }));
   },
 
-  uploadFile: async () => {
-     return '/water_leak.png'; 
+  uploadFile: async (bucket, file, userId) => {
+    if (IS_DEMO_MODE) return '/water_leak.png';
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      // Construct public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (err) {
+      console.error('Upload fail:', err);
+      // Fallback for safety during user testing
+      return '/water_leak.png';
+    }
   }
 }));

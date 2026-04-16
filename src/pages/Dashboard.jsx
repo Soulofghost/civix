@@ -235,6 +235,10 @@ export default function Dashboard() {
                     <img 
                       src={complaint.attachments?.[0] || 'https://images.unsplash.com/photo-1518135839073-427c945a6c66?q=80&w=800&auto=format&fit=crop'} 
                       alt={complaint.title} 
+                      onError={(e) => {
+                        e.target.onerror = null; 
+                        e.target.src = '/water_leak.png';
+                      }}
                       className="w-full h-full object-cover grayscale-[0.2] transition-all duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-60" />
