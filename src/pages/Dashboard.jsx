@@ -29,9 +29,11 @@ export default function Dashboard() {
   }, [fetchComplaints, initializeRealtime]);
 
   // Memoized regional data
-  const regionalComplaints = useMemo(() => 
-    user.role === 'Super Admin' ? complaints : complaints.filter(c => c.region.city === userRegion.city),
-  [complaints, user.role, userRegion.city]);
+  const regionalComplaints = useMemo(() => {
+    if (!user) return [];
+    return user.role === 'Super Admin' ? complaints : complaints.filter(c => c.region?.city === userRegion?.city);
+  }, [complaints, user, userRegion]);
+
 
   const filteredComplaints = useMemo(() => 
     regionalComplaints.filter(c => {
