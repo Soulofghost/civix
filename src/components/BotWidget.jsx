@@ -36,30 +36,54 @@ export default function BotWidget() {
     msgEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isOpen]);
 
-  const handleSend = (userMsg) => {
+  const handleSend = async (userMsg) => {
     if (!userMsg?.trim()) return;
 
     setMessages(prev => [...prev, { text: userMsg.trim(), sender: 'user' }]);
     setInput('');
 
-    setTimeout(() => {
-      let botResponse = '';
-      const lowerMsg = userMsg.toLowerCase();
-      
-      if (lowerMsg.includes('legal') || lowerMsg.includes('advocate')) {
-        botResponse = MOCK_FAQ[lang]['legal'];
-      } else if (lowerMsg.includes('nearby') || lowerMsg.includes('region')) {
-        const regionalCount = complaints.filter(c => c.region.city === userRegion.city).length;
-        botResponse = `There are currently ${regionalCount} reports active in ${userRegion.city}. Would you like to see a summary?`;
-      } else {
-        const dict = MOCK_FAQ[lang];
-        const match = Object.keys(dict).find(k => lowerMsg.includes(k));
-        botResponse = dict[match] || dict['default'];
-      }
+    try {
+      const response = await fetch('http://localhost:5000/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: userMsg,
+          context: {
+            city: userRegion.city,
+            complaintCount: complaints.length,
+            userRole: 'Citizen'
+          },
+          language: lang
+        })
+      });
 
-      setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
-    }, 600);
+      if (!response.ok) throw new Error('API down');
+      const data = await response.json();
+      setMessages(prev => [...prev, { text: data.text, sender: 'bot' }]);
+    } catch (error) {
+      console.warn('AI API failed, falling back to mock FAQ');
+      setTimeout(() => {
+        let botResponse = '';
+        const lowerMsg = userMsg.toLowerCase();
+        
+        if (lowerMsg.includes('legal') || lowerMsg.includes('advocate')) {
+          botResponse = MOCK_FAQ[lang]['legal'];
+        } else if (lowerMsg.includes('nearby') || lowerMsg.includes('region')) {
+          const regionalCount = complaints.filter(c => c.region.city === userRegion.city).length;
+          botResponse = `There are currently ${regionalCount} reports active in ${userRegion.city}. Would you like to see a summary?`;
+        } else {
+          const dict = MOCK_FAQ[lang];
+          const match = Object.keys(dict).find(k => lowerMsg.includes(k));
+          botResponse = dict[match] || dict['default'];
+        }
+
+        setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
+      }, 600);
+    }
   };
+
 
   const toggleVoice = () => {
     setIsListening(!isListening);

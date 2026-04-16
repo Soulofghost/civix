@@ -15,8 +15,9 @@ import { generateAndUploadReport } from '../utils/reportGenerator';
 export default function SubmitComplaint() {
   const navigate = useNavigate();
   const { addComplaint, uploadFile } = useComplaintStore();
-  const { user } = useAuthStore();
+  const { user, addKarma } = useAuthStore();
   const { availableRegions, departments } = useRegionStore();
+
   const { t } = useLanguageStore();
 
   const [form, setForm] = useState({
@@ -114,11 +115,15 @@ export default function SubmitComplaint() {
     const ticketId = await addComplaint(complaintData);
 
     if (ticketId) {
+      // Award karma
+      addKarma(25);
+      
       // Generate report PDF in background
       generateAndUploadReport({ ...complaintData, id: ticketId }, user?.id || 'anonymous')
         .then(url => console.log('Report protocol finalized:', url))
         .catch(err => console.error('Report protocol failed:', err));
     }
+
     
     setTimeout(() => {
       setIsOptimisticReporting(false);
@@ -126,6 +131,32 @@ export default function SubmitComplaint() {
       navigate('/dashboard');
     }, 1500);
   };
+
+  const [duplicates, setDuplicates] = useState([]);
+
+  useEffect(() => {
+    const checkDuplicates = async () => {
+      if (form.title.length > 5 && form.category) {
+        try {
+          const response = await fetch('http://localhost:5000/api/complaints/check-duplicates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: form.title,
+              category: form.category,
+              location: { city: form.city }
+            })
+          });
+          const data = await response.json();
+          setDuplicates(data.duplicates || []);
+        } catch (err) {
+          console.error('Duplicate detection failure');
+        }
+      }
+    };
+    const timer = setTimeout(checkDuplicates, 1000);
+    return () => clearTimeout(timer);
+  }, [form.title, form.category, form.city]);
 
   const simulateVoiceRecording = () => {
     setIsListening(true);
@@ -142,6 +173,7 @@ export default function SubmitComplaint() {
       toast.success('Signal decoded and auto-tagged in protocol.');
     }, 3000);
   };
+
 
   return (
     <div className="max-w-6xl mx-auto space-y-12 pb-20 animate-in fade-in slide-in-from-bottom-8 duration-700 font-jakarta">
@@ -184,38 +216,64 @@ export default function SubmitComplaint() {
                  <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Step 01 / 03</span>
               </div>
 
-              <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase text-white/30 ml-1 tracking-widest">Issue Title</label>
-                    <input
-                      type="text"
-                      placeholder="What would you like to call this report?"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500/50 transition-all text-sm font-medium"
-                      value={form.title}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    />
-                 </div>
-                 
-                 <div className="space-y-2 relative">
-                    <label className="text-[10px] font-black uppercase text-white/30 ml-1 tracking-widest">Describe the Problem</label>
-                    <textarea
-                      placeholder="Tell us what is happening. You can type it here or click the microphone to speak! Our AI will help route it to the right person..."
-                      rows={8}
-                      className="w-full bg-white/5 border border-white/10 rounded-3xl px-6 py-5 focus:outline-none focus:border-purple-500/50 transition-all text-sm font-medium leading-relaxed resize-none"
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                    <div className="absolute bottom-6 right-6 flex items-center gap-4">
-                       <button 
-                        type="button"
-                        onClick={simulateVoiceRecording}
-                        className={`p-4 rounded-2xl transition-all shadow-xl group ${isListening ? 'bg-rose-500 animate-pulse text-white' : 'bg-purple-600/20 text-purple-400 hover:bg-purple-600 hover:text-white'}`}
-                       >
-                         {isListening ? <MicOff size={24} /> : <Mic size={24} />}
-                       </button>
-                    </div>
-                 </div>
-              </div>
+                  <div className="space-y-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black uppercase text-white/30 ml-1 tracking-widest">Issue Title</label>
+                     <input
+                       type="text"
+                       placeholder="What would you like to call this report?"
+                       className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-purple-500/50 transition-all text-sm font-medium"
+                       value={form.title}
+                       onChange={(e) => setForm({ ...form, title: e.target.value })}
+                     />
+                  </div>
+
+                  <AnimatePresence>
+                    {duplicates.length > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl space-y-3"
+                      >
+                        <div className="flex items-center gap-2 text-amber-500 font-black uppercase text-[10px] tracking-widest">
+                           <AlertTriangle size={14} /> Similar Issues Detected
+                        </div>
+                        <p className="text-[10px] text-white/40 leading-relaxed uppercase">
+                          Residents have already reported similar issues in your city. Instead of a new report, you could upvote existing ones to increase priority.
+                        </p>
+                        <div className="space-y-2">
+                           {duplicates.slice(0, 2).map(dup => (
+                             <div key={dup.id} className="flex items-center justify-between bg-white/5 p-3 rounded-xl">
+                                <span className="text-xs font-bold text-white/70 truncate mr-4">{dup.title}</span>
+                                <button type="button" onClick={() => navigate('/dashboard')} className="text-[9px] font-black uppercase tracking-widest text-amber-500 hover:text-amber-400">View Issue</button>
+                             </div>
+                           ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  
+                  <div className="space-y-2 relative">
+                     <label className="text-[10px] font-black uppercase text-white/30 ml-1 tracking-widest">Describe the Problem</label>
+                     <textarea
+                       placeholder="Tell us what is happening. You can type it here or click the microphone to speak! Our AI will help route it to the right person..."
+                       rows={8}
+                       className="w-full bg-white/5 border border-white/10 rounded-3xl px-6 py-5 focus:outline-none focus:border-purple-500/50 transition-all text-sm font-medium leading-relaxed resize-none"
+                       value={form.description}
+                       onChange={(e) => setForm({ ...form, description: e.target.value })}
+                     />
+                     <div className="absolute bottom-6 right-6 flex items-center gap-4">
+                        <button 
+                         type="button"
+                         onClick={simulateVoiceRecording}
+                         className={`p-4 rounded-2xl transition-all shadow-xl group ${isListening ? 'bg-rose-500 animate-pulse text-white' : 'bg-purple-600/20 text-purple-400 hover:bg-purple-600 hover:text-white'}`}
+                        >
+                          {isListening ? <MicOff size={24} /> : <Mic size={24} />}
+                        </button>
+                     </div>
+                  </div>
+               </div>
            </div>
 
            <div className="glass-panel p-8 space-y-8 bg-white/[0.02] border-white/5">

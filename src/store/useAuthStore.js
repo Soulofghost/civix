@@ -116,6 +116,23 @@ export const useAuthStore = create((set) => ({
       user: { ...state.user, ...updates },
       loading: false
     }));
+  },
+
+  addKarma: async (amount) => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+    
+    const newKarma = (user.karma || 0) + amount;
+    
+    await supabase
+      .from('profiles')
+      .update({ karma: newKarma })
+      .eq('id', user.id);
+      
+    set((state) => ({
+      user: { ...state.user, karma: newKarma }
+    }));
   }
 }));
+
 

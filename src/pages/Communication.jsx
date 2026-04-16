@@ -12,10 +12,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Communication() {
   const { user } = useAuthStore();
-  const { rooms, messages, sendMessage } = useChatStore();
+  const { rooms, messages, sendMessage, initSocket, joinRoom } = useChatStore();
   const { userRegion } = useRegionStore();
   
-  const [activeChannel, setActiveChannel] = useState(rooms[0]?.id || 'announcements');
+  useEffect(() => {
+    const cleanup = initSocket();
+    rooms.forEach(r => joinRoom(r.id));
+    return cleanup;
+  }, [initSocket, rooms, joinRoom]);
+
+  const [activeChannel, setActiveChannel] = useState('announcements');
   const [message, setMessage] = useState('');
   const chatEndRef = useRef(null);
 
@@ -122,14 +128,23 @@ export default function Communication() {
             <section>
               <h3 className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Voice Channels</h3>
               <div className="space-y-1">
-                {['Control Hub', 'Public Hearing'].map(v => (
-                  <button key={v} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/30 hover:bg-white/5 transition-all italic">
-                    <Volume2 size={16} className="text-emerald-500/40" />
-                    <span>{v}</span>
+                {[
+                  { id: 'control-hub', name: 'Control Hub' },
+                  { id: 'public-hearing', name: 'Public Hearing' }
+                ].map(v => (
+                  <button 
+                    key={v.id} 
+                    onClick={() => toast.info(`Initializing WebRTC handshake for ${v.name}...`)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-white/30 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all italic group"
+                  >
+                    <Volume2 size={16} className="text-emerald-500/40 group-hover:text-emerald-400" />
+                    <span>{v.name}</span>
+                    <div className="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse opacity-0 group-hover:opacity-100" />
                   </button>
                 ))}
               </div>
             </section>
+
           </div>
 
           <div className="glass-panel p-4 border-white/5 bg-gradient-to-br from-white/5 to-transparent">
