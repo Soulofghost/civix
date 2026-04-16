@@ -26,12 +26,15 @@ export default function AdminDashboard() {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
 
-  const filteredComplaints = useMemo(() => 
-    complaints.filter(c => {
-      const matchesRegion = user.role === 'Super Admin' || c.region.city === userRegion.city;
+  const filteredComplaints = useMemo(() => {
+    if (!user) return [];
+    return complaints.filter(c => {
+      const matchesRegion = user.role === 'Super Admin' || c.region?.city === userRegion?.city;
       const matchesStatus = filter === 'All' || c.status === filter;
       return matchesRegion && matchesStatus;
-    }), [complaints, user.role, userRegion.city, filter]);
+    });
+  }, [complaints, user, userRegion, filter]);
+
 
   const stats = [
     { label: 'Network Load', value: complaints.length, icon: <Activity />, color: 'text-purple-400', trend: '+12% flux' },
