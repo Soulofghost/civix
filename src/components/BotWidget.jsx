@@ -3,6 +3,7 @@ import { useComplaintStore } from '../store/useComplaintStore';
 import { useRegionStore } from '../store/useRegionStore';
 import { MessageSquare, X, Send, Bot, Mic, Scale, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { safeFetch } from '../utils/api';
 
 const MOCK_FAQ = {
   english: {
@@ -43,7 +44,7 @@ export default function BotWidget() {
     setInput('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/ai/chat', {
+      const data = await safeFetch('/api/ai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -59,8 +60,7 @@ export default function BotWidget() {
         })
       });
 
-      if (!response.ok) throw new Error('API down');
-      const data = await response.json();
+      if (!data) throw new Error('API down');
       setMessages(prev => [...prev, { text: data.text, sender: 'bot' }]);
     } catch (error) {
       console.warn('AI API failed, falling back to mock FAQ');

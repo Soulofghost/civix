@@ -1,86 +1,103 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import MainLayout from './layouts/MainLayout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import SubmitComplaint from './pages/SubmitComplaint';
-import Communication from './pages/Communication';
-import AdminDashboard from './pages/AdminDashboard';
-import Leaderboard from './pages/Leaderboard';
-import Profile from './pages/Profile';
-import BotWidget from './components/BotWidget';
 import ErrorBoundary from './components/ErrorBoundary';
 
+// Lazy loading for production optimization
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const SubmitComplaint = lazy(() => import('./pages/SubmitComplaint'));
+const Communication = lazy(() => import('./pages/Communication'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+const BotWidget = lazy(() => import('./components/BotWidget'));
+
+/**
+ * Civix Security Protocol: Protected Route Controller
+ */
 const ProtectedRoute = ({ children, roles }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, loading } = useAuthStore();
+  const location = useLocation();
   
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (roles && !roles.includes(user?.role)) return <Navigate to="/dashboard" />;
+  if (loading) return null; // Wait for initialization
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (roles && !roles.includes(user?.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
   
   return children;
 };
 
-
-function Home() {
-  const { user, isAuthenticated } = useAuthStore();
-  
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  
-  if (['Admin', 'Super Admin', 'Authority', 'Field Worker'].includes(user?.role)) {
-    return <Navigate to="/admin" />;
-  }
-  
-  return <Navigate to="/dashboard" />;
-}
+/**
+ * Global Presentation-Ready Loading Component (Fail-Safe)
+ */
+const GlobalLoader = () => (
+  <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0A0B10] font-jakarta">
+    <div className="relative mb-8">
+      <div className="absolute -inset-8 bg-purple-500/10 rounded-full blur-[60px] animate-pulse"></div>
+      <div className="w-16 h-16 border-2 border-white/5 border-t-purple-500 rounded-full animate-spin relative z-10"></div>
+    </div>
+    <div className="space-y-3 flex flex-col items-center">
+       <p className="text-white font-black italic tracking-widest uppercase text-[10px] animate-pulse text-center">
+         Synchronizing Neural Interface...
+       </p>
+       <p className="text-white/20 text-[8px] font-bold uppercase tracking-widest text-center">
+         Authorized Entry Protocols in Progress
+       </p>
+    </div>
+  </div>
+);
 
 function App() {
-  const { isAuthenticated, initialize, loading, error: authError } = useAuthStore();
+  const { isAuthenticated, initialize, loading } = useAuthStore();
 
   useEffect(() => {
-    console.log("APP: Initializing main application logic...");
+    console.log("APP: Initializing Civix Stability Protocol (Production Edition)");
     initialize().catch(err => {
-      console.error("APP_INIT_ERROR:", err);
+      console.error("APP_INIT_FAIL: Critical security breach or connection loss.", err);
     });
   }, [initialize]);
 
-  if (loading) {
-    return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-[#0A0B10]">
-        <div className="relative mb-6">
-          <div className="absolute -inset-4 bg-purple-500/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="w-16 h-16 border-4 border-purple-500/10 border-t-purple-500 rounded-full animate-spin relative z-10"></div>
-        </div>
-        <p className="text-white/40 font-black italic tracking-widest uppercase text-[10px] animate-pulse">
-          Synchronizing Neural Interface...
-        </p>
-        <div className="mt-8 flex gap-2">
-           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0s' }}></span>
-           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0.2s' }}></span>
-           <span className="w-2 h-2 rounded-full bg-white/5 animate-bounce" style={{ animationDelay: '0.4s' }}></span>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <GlobalLoader />;
 
   return (
     <ErrorBoundary>
-      {isAuthenticated && <p className="fixed top-2 left-1/2 -translate-x-1/2 z-[9999] text-[8px] font-black text-emerald-500/40 uppercase tracking-[0.5em] pointer-events-none">Dashboard Ready ✅</p>}
-      <Routes>
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Home />} />
-        
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute roles={['Admin', 'Super Admin', 'Authority', 'Field Worker']}><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/submit" element={<ProtectedRoute><SubmitComplaint /></ProtectedRoute>} />
-          <Route path="/communication" element={<ProtectedRoute><Communication /></ProtectedRoute>} />
-          <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        </Route>
+      {/* Presentation Metadata */}
+      {isAuthenticated && (
+        <div className="fixed top-2 left-1/2 -translate-x-1/2 z-[10000] pointer-events-none select-none">
+           <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/5 shadow-2xl">
+              <div className="w-1 h-1 rounded-full bg-emerald-500 animate-ping" />
+              <span className="text-[8px] font-black text-emerald-500 uppercase tracking-[0.3em]">Grid Status: Stable</span>
+           </div>
+        </div>
+      )}
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <Suspense fallback={<GlobalLoader />}>
+        <Routes>
+          {/* Default Route Logic */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          
+          <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} />
+          
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute roles={['Admin', 'Super Admin', 'Authority', 'Field Worker']}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/submit" element={<ProtectedRoute><SubmitComplaint /></ProtectedRoute>} />
+            <Route path="/communication" element={<ProtectedRoute><Communication /></ProtectedRoute>} />
+            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          </Route>
+
+          {/* Fail-Safe Wildcard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
       
       {isAuthenticated && <BotWidget />}
     </ErrorBoundary>

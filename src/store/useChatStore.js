@@ -1,19 +1,27 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
+import { API_URL } from '../utils/api';
 
-// Fail-safe socket initialization
-const SOCKET_URL = import.meta.env.VITE_MCP_API_URL || import.meta.env.NEXT_PUBLIC_MCP_API_URL || 'http://localhost:5000';
+// Fail-safe socket initialization using the unified API utility
+const SOCKET_URL = API_URL || '';
 
 let socket;
 try {
-  socket = io(SOCKET_URL, {
-    reconnectionAttempts: 3,
-    timeout: 5000,
-    autoConnect: false // Don't auto-connect to prevent top-level hang
-  });
+  // Only attempt socket connection if we are in a browser environment
+  if (typeof window !== 'undefined') {
+    socket = io(SOCKET_URL, {
+      reconnectionAttempts: 3,
+      timeout: 5000,
+      autoConnect: false,
+      transports: ['websocket', 'polling'] // Ensure compatibility across hosting providers
+    });
+  } else {
+    // SSR Safe Mock
+    socket = { on: () => {}, emit: () => {}, off: () => {}, connect: () => {} };
+  }
 } catch (e) {
-  console.error("SOCKET_INIT_CRITICAL:", e);
-  socket = { on: () => {}, emit: () => {}, off: () => {} }; // Mock socket
+  console.error("CHAT_SOCKET_INIT_CRITICAL:", e);
+  socket = { on: () => {}, emit: () => {}, off: () => {}, connect: () => {} };
 }
 
 export const useChatStore = create((set, get) => ({
@@ -25,17 +33,19 @@ export const useChatStore = create((set, get) => ({
   isConnected: false,
 
   initSocket: () => {
-    console.log("CHAT: Initializing real-time communication protocol...");
+    console.log(`CHAT: Synchronizing with regional hub at [${SOCKET_URL}]`);
     try {
-      if (!socket.connected) socket.connect();
+      if (!socket.connected && typeof socket.connect === 'function') {
+        socket.connect();
+      }
 
       socket.on('connect', () => {
-        console.log("CHAT: Connectivity established with regional hub.");
+        console.log("CHAT: Connectivity established with grid.");
         set({ isConnected: true });
       });
 
       socket.on('disconnect', () => {
-        console.log("CHAT: Connectivity lost. System in offline stance.");
+        console.log("CHAT: Grid connectivity lost. Stance: Offline.");
         set({ isConnected: false });
       });
 
@@ -57,12 +67,11 @@ export const useChatStore = create((set, get) => ({
         socket.off('receive-message');
       };
     } catch (err) {
-      console.error("CHAT_INIT_FAIL:", err);
+      console.warn("CHAT_INIT_FAIL: Continuing in localized mode.", err);
     }
   },
 
   joinRoom: (roomId) => {
-    console.log(`CHAT: Entering room [${roomId}]`);
     try {
        socket.emit('join-room', roomId);
        if (!get().messages[roomId]) {
@@ -71,7 +80,7 @@ export const useChatStore = create((set, get) => ({
          }));
        }
     } catch (e) {
-       console.warn("CHAT_JOIN_FAIL: Offline mode.", e);
+       console.warn("CHAT_ROOM_JOIN_FAIL:", e);
     }
   },
 
@@ -80,7 +89,7 @@ export const useChatStore = create((set, get) => ({
        const data = { ...messageData, roomId };
        socket.emit('send-message', data);
     } catch (e) {
-       console.error("CHAT_SEND_FAIL:", e);
+       console.error("CHAT_MESSAGE_SEND_FAIL:", e);
     }
   },
 
@@ -97,7 +106,7 @@ export const useChatStore = create((set, get) => ({
       
       socket.emit('join-room', roomId);
     } catch (e) {
-       console.error("CHAT_ROOM_CREATE_FAIL:", e);
+       console.error("CHAT_ROOM_ALLOCATION_FAIL:", e);
     }
   }
 }));

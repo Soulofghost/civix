@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { generateAndUploadReport } from '../utils/reportGenerator';
+import { safeFetch } from '../utils/api';
 
 export default function SubmitComplaint() {
   const navigate = useNavigate();
@@ -138,7 +139,7 @@ export default function SubmitComplaint() {
     const checkDuplicates = async () => {
       if (form.title.length > 5 && form.category) {
         try {
-          const response = await fetch('http://localhost:5000/api/complaints/check-duplicates', {
+          const data = await safeFetch('/api/complaints/check-duplicates', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -147,8 +148,10 @@ export default function SubmitComplaint() {
               location: { city: form.city }
             })
           });
-          const data = await response.json();
-          setDuplicates(data.duplicates || []);
+          
+          if (data) {
+            setDuplicates(data.duplicates || []);
+          }
         } catch (err) {
           console.error('Duplicate detection failure');
         }
@@ -442,7 +445,7 @@ export default function SubmitComplaint() {
           <div className="p-6 rounded-3xl bg-black/40 border border-white/5 flex gap-4">
              <div className="p-3 bg-purple-500/10 rounded-2xl h-fit">
                 <Info size={16} className="text-purple-400" />
-             </div>
+              </div>
              <p className="text-[10px] text-white/40 font-bold leading-relaxed uppercase">
                 BY AUTHORIZING THIS PROTOCOL, YOU AGREE TO THE DIGITAL CIVIL DISCOURSE ACT OF 2026. ALL DATA IS HASHED IN THE PRIVATE STATE LEDGER.
              </p>

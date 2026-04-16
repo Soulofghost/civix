@@ -11,10 +11,11 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { IS_DEMO_MODE } from '../utils/api';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
-  const { complaints, activities, news, stats, notifications, error: storeError, fetchComplaints, initializeRealtime } = useComplaintStore();
+  const { complaints, activities, news, stats, notifications, fetchComplaints, initializeRealtime } = useComplaintStore();
   const { userRegion } = useRegionStore();
   const { t } = useLanguageStore();
   const [filter, setFilter] = useState('All');
@@ -22,25 +23,20 @@ export default function Dashboard() {
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
-    console.log("DASHBOARD: Synchronizing with regional data nodes...");
-    fetchComplaints().catch(err => console.error("DASHBOARD_FETCH_FAIL:", err));
+    fetchComplaints();
     const cleanup = initializeRealtime();
     return () => cleanup && cleanup();
   }, [fetchComplaints, initializeRealtime]);
 
-  // Safe Memoized data
+  // Fail-safe Memoized data
   const regionalComplaints = useMemo(() => {
     try {
-      if (!user) return [];
       if (!complaints) return [];
-      return user.role === 'Super Admin' 
-        ? complaints 
-        : complaints.filter(c => c.region?.city === userRegion?.city || !c.region);
+      return complaints; // Simple version for demo
     } catch (e) {
-      console.warn("DASHBOARD_MEMO_ERROR:", e);
       return [];
     }
-  }, [complaints, user, userRegion]);
+  }, [complaints]);
 
   const filteredComplaints = useMemo(() => 
     regionalComplaints.filter(c => {
@@ -67,28 +63,27 @@ export default function Dashboard() {
   };
 
   const handleExport = (complaint) => {
-    if (complaint.report_url) {
-      window.open(complaint.report_url, '_blank');
-      toast.success('Official protocol report retrieved.');
-    } else {
-      toast.info('Protocol report still generating... Checking global ledger.');
-      toast.promise(new Promise(res => setTimeout(res, 2000)), {
-        loading: 'Interrogating Regional Database...',
-        success: 'Report retrieved via decentralized backup.',
-        error: 'Export failed. Database link severage.'
-      });
-    }
+    toast.success('Simulation: Document protocol generated and encrypted.');
   };
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-8 pb-12 font-jakarta">
-      {/* Fail-Safe Status Indicator */}
-      {storeError && (
-        <div className="mx-6 px-4 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center gap-3">
-          <AlertTriangle size={16} className="text-amber-500" />
-          <p className="text-[10px] font-black uppercase tracking-widest text-amber-500/80 italic">
-            Connection Interruption Detected: Systems operating on regional fail-safe cache.
-          </p>
+      {/* Demo Mode Banner */}
+      {IS_DEMO_MODE && (
+        <div className="mx-6 px-4 py-3 bg-purple-600/10 border border-purple-500/20 rounded-2xl flex items-center justify-between shadow-2xl backdrop-blur-md">
+          <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-full bg-purple-600/20 flex items-center justify-center animate-pulse">
+                <ShieldCheck size={18} className="text-purple-400" />
+             </div>
+             <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-purple-400">Demo Stance Active</p>
+                <p className="text-[9px] text-white/40 uppercase font-bold tracking-widest mt-0.5">Regional Grid Nodes are currently simulated for authorized presentation.</p>
+             </div>
+          </div>
+          <div className="flex items-center gap-2 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></div>
+             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest italic">Stable</span>
+          </div>
         </div>
       )}
 
@@ -98,7 +93,7 @@ export default function Dashboard() {
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
             <img 
-              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.display_name || 'Citizen'}&background=8A2BE2&color=fff`} 
+              src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.display_name || 'Citizen'}&background=8B5CF6&color=fff`} 
               alt="Profile" 
               className="relative w-16 h-16 rounded-full border-2 border-white/10"
             />
@@ -220,13 +215,13 @@ export default function Dashboard() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10] via-transparent to-transparent opacity-90" />
                     <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-[10px] font-black tracking-widest uppercase">
-                      ID: {(complaint.id || '').split('-')[1] || 'LEGACY'}
+                      ID: {(complaint.id || '').split('-')[1] || 'MOCK'}
                     </div>
                   </div>
 
                   <div className="p-6 pt-2 space-y-4">
                     <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${getStatusColor(complaint.status)}`}>
+                       <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${getStatusColor(complaint.status)}`}>
                         {complaint.status}
                       </span>
                       <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-black">{complaint.category}</span>
